@@ -1,14 +1,3 @@
-```
-🤖 L'IA a été utilisée pour faciliter la collecte d'informations et expliquer 
-des concepts mathématiques présentés de manière très abrupte dans les articles
-de recherche sur le sujet. Cependant, l'ensemble du contenu et des calculs ont 
-été rédigés par un humain (sauf mention contraire).
-
-Cet article a pour but de présenter et d'expliquer de façon accessible un sujet 
-aussi complexe que l'iO sans pour autant faire de concessions avec la réalité du sujet. 
-Si une erreur est présente dans cette papier merci de m'en faire part.
-```
-
 # L'obfuscation indistinguable (iO)
 
 L'objectif est de pouvoir rendre le code publique mais mathématiquement impossible à reverse. Ce type de méthode pourrait permettre, entre autre, de rendre tous les logiciels propriétaires et close source on-premise, de faire des calculs sur des block chains décentralisées publiques sans que les données le soit ; mais surtout pourrait rendre possible la cryptographie en boite blanche. 
