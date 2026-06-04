@@ -1,5 +1,5 @@
 # Introduction to cryptography
-### Fondements
+### Foundations
 #### Number theory
 Number theory is a field of mathematics that study the integers (1, 5, 2, 6, -2, -8, -6) (not 5.6, 8.9, 1.4).
 
@@ -29,7 +29,7 @@ GCD(7, 20) = 1
 ##### Modular arithmetic
 Calculating 10¹²⁸ is very time-consuming. But calculating 10¹²⁸ mod 5 is much simpler thanks to modular exponentiation.
 
-Example avec 4⁸ mod 10
+Example with 4⁸ mod 10
 ```
 4 ** 2 = 16
 4 ** 4 = (4 ** 2) ** 2 = 16 ** 2 = 256
@@ -70,8 +70,8 @@ Problems are classified according to the time required to solve them :
 Without randomness a message encrypted, will always give the same result. That's why we use sources of randomness, starting with the key.
 
 - salt
-- bruit
-??? comment revenir au résultat lors du déchiffrement si on rajoute du bruit ?
+- noise
+??? how do we get back to the result during decryption if we add noise ?
 
 #### Polynomes
 Polynomes are objects that allow data (bytes) to be manipulated in a very structured and invertible way.
@@ -177,7 +177,7 @@ M = 2 ; the message
 ```
 C = 2 ** e % N
 C = 2 ** 7 % 143
-C = 128 % 143 (0 et reste 128)
+C = 128 % 143 (0 and remainder 128)
 C = 128
 ```
 
@@ -308,12 +308,12 @@ They obtain the same secret key, without having shared it.
 
 Today modern version of Diffie Hellman concept use the same concept but with Elliptic curve.
 
-### Cryptographie symétrique
+### Symmetric Cryptography
 #### AES
 
 AES (Advanced Encryption Standard) is a symetrical block cipher algorithm. One of the most widely used encryption methods in the world, notably via TLS.
 
-In trivial way, AES is about doing some succesive XOR oppérations and non-linearity to this system.
+In trivial way, AES is about doing some succesive XOR operations and non-linearity to this system.
 
 Here is a more complete description :
 
@@ -414,8 +414,7 @@ Example with 01000001 (41) :
 01000001
 GF(2⁸) = “Galois Field of 256 elements"
 
-We then transform 
-On transforme the sequence of bits as a polynomial (that is, as a function of their weight): value**location
+We then transform the sequence of bits into a polynomial (that is, as a function of their weight): value**location
 the 0th bit = 1⁰
 the sixth bit = 1⁶
 
@@ -467,10 +466,10 @@ We finaly calculate S(x) :
 ```
 S(x) = (A*x) XOR b
 x = 00011001
-A = matrice 8×8 fixe GÉNÉRÉ COMMENT ?
-b = constante 01100011 TROUVÉ OU CETTE CONSTANTE ?
+A = fixed 8×8 matrix GENERATED HOW ?
+b = constant 01100011 WHERE DOES THIS CONSTANT COME FROM ?
 
-DÉTAIL DU CALCULE DES ENFERS
+DETAIL OF THE CALCULATION FROM HELL
 
 S(01000001) = 10111010
 ```
@@ -562,7 +561,7 @@ WARNING: Since we are working with polynomials here, the × symbol does not repr
 value :    00000010 × 10110110
 position : 76543210   76543210
 
-00000010 = x CAR ?
+00000010 = x WHY ?
 10110110 = x^7 + x^5 + x^4 + x^2 + x
 x × (x^7 + x^5 + x^4 + x^2 + x)
 
@@ -619,7 +618,7 @@ As a xor b = c, and c xor a = b, we can as in the encryption process generate th
 
 #### DES
 
-Basé sur Feistel (https://www.youtube.com/watch?v=FGhj3CGxl8I)
+Based on Feistel (https://www.youtube.com/watch?v=FGhj3CGxl8I)
 
 #### Modes
 In cryptography, a block cipher mode of operation is an algorithm that uses a block cipher to provide information security such as confidentiality or authenticity. A block cipher by itself is only suitable for the secure cryptographic transformation (encryption or decryption) of one fixed-length group of bits called a block. A mode of operation describes how to repeatedly apply a cipher's single-block operation to securely transform amounts of data larger than a block.
@@ -643,7 +642,7 @@ The problem is also that an attacker can modify the encrypted message. The syste
 CBC is also vulnerable to the padding oracle attack (cf : Padding oracle).
 
 ##### CTR (Counter mode)
-Au lieu de chiffrer le message directement, l'algorithme va chiffrer une suite de nombres (des compteurs) pour générer un flux de données pseudo-aléatoires, que l'on appelle le Keystream (ou flux de clé).
+Instead of encrypting the message directly, the algorithm will encrypt a sequence of numbers (counters) to generate a stream of pseudo-random data, which is called the Keystream (or key stream).
 
 ```
 nonce_1, nonce_2 = nonce_1+1, nonce_3 = nonce_1+2
@@ -693,7 +692,7 @@ Where x is the number of cipher block.
 ```
 And this is what it is parallelizable. This is why GCM is called a "PMAC" (Parallelizable message authentication code).
 
-### Fonctions de hachage
+### Hash functions
 #### SHA-1
 Based on the Merkle-Damgård structure (TO WRITE).
 
@@ -756,17 +755,17 @@ ft : A logical function that changes every 20 rounds
 Kt : A constant that also changes every 20 rounds
 Wt : The message word corresponding to the current round
 
-Kt : constante comme les H
+Kt : constant like the H values
 Round 0-19 : 0x5A827999
 Round 20-39 : 0x6ED9EBA1
 Round 40-59 : 0x8F1BBCDC
 Round 60-79 : 0xCA62C1D6
 
 ft :
-Round 0 à 19 : (b AND c) OR (NOT b AND d)
-Round 20 à 39 : b xor c xor d
-Round 40 à 59 : (b AND c) OR (b AND d) OR (c AND d)
-Round 60 à 79 : b xor c xor d
+Round 0 to 19 : (b AND c) OR (NOT b AND d)
+Round 20 to 39 : b xor c xor d
+Round 40 to 59 : (b AND c) OR (b AND d) OR (c AND d)
+Round 60 to 79 : b xor c xor d
 ```
 
 ##### Why these operations ?
@@ -776,9 +775,9 @@ These operations have the property of producing an avalanche effect, meaning tha
 They come from the square roots of integers (2, 3, 5, 10) or are simple hexadecimal sequences to prove that there is no "backdoor" in the algorithm.
 
 #### SHA-2
-Where SHA-1 is only one algorithme, SHA-2 is a family of hahs containing 32 and 64 bits version :
+Where SHA-1 is only one algorithm, SHA-2 is a family of hashes containing 32 and 64 bits version :
 SHA-224, SHA-256 : 32 bits version
-SHA-384 et SHA-512 : 64 bits version (most accurate for x64 CPU)
+SHA-384 and SHA-512 : 64 bits version (most accurate for x64 CPU)
 
 ```
                    SHA-256, SHA-512
@@ -789,9 +788,9 @@ Number of rounds : 64,      80
 
 ##### Here is how SHA-256 works :
 
-Concernant la génération de la taille et du padding c'est exactement comme SHA1
+The generation of the size and the padding is exactly like SHA1
 
-Au lieu de 5 constantes, on en a 8 (car le hash final fait 256 bits, et 8 * 32 = 256) :
+Instead of 5 constants, we have 8 (because the final hash is 256 bits, and 8 * 32 = 256) :
 ```
 h0 ... h7
 ```
@@ -818,14 +817,14 @@ Like in SHA1 the 512 bits are divided into 16 words of 32 bits :
 W0, W1 ... W15
 ```
 
-But the words 16 to 63 arent just generated from XOR operation of the previous one, On utilise des fonctions de rotation complexes nommées littleSigma_0 et littleSigma_1 :
+But the words 16 to 63 arent just generated from XOR operation of the previous one, we use complex rotation functions named littleSigma_0 and littleSigma_1 :
 ```
 for t in 16...63:
     Wt = littleSigma_1(W[t]-2) + W[t]-7 + littleSigma_0(W[t]-15) + W[t]-16
 
 Where W[t]-2 means : The word that was generated 2 steps earlier...
 ```
-*description des fonctions sigma à la fin*
+*description of the sigma functions at the end*
 
 Rather than having 4 different "Kt" constants, we have 64 (one per round).
 
@@ -878,7 +877,7 @@ x >>> 2 = right rotation of 2
 ```
 
 #### SHA-3
-Basé sur l'algorithme de Keccak (TO WRITE).
+Based on the Keccak algorithm (TO WRITE).
 
 Padding management :
 ```
@@ -1052,7 +1051,7 @@ opad (outer padding): A repeated constant (0x5c)
 
 To verify a message we recalculates the HMAC.
 
-##### Why ipad et opad ?
+##### Why ipad and opad ?
 cf : Length Extension attack
 
 #### Hash vulnerabilities and Attack
@@ -1205,13 +1204,13 @@ The goal here is not to read the data used by the victim, but to know which memo
 
 - If the key bit is 0, the algorithm will get the information in index B.
 
-Flush + Reload : The attacker clears a specific cache entry. They wait for the victim to execute the command, then reload the data. If they reload it quickly, it means the victim has used it. Very precise, but requires sharing files (libraries) with the victim. POURQUOI J'AI PAS COMPRIS CETTE PARTIE
+Flush + Reload : The attacker clears a specific cache entry. They wait for the victim to execute the command, then reload the data. If they reload it quickly, it means the victim has used it. Very precise, but requires sharing files (libraries) with the victim. WHY DIDN'T I UNDERSTAND THIS PART
 
 Prime + Probe : The attacker fills the cache with their own data. They let the victim execute. If the attacker's access to their own data is subsequently slow, it means the victim has "expelled" their data to use that cache space. Precise, requires sharing the same processor, but you monitor your own data.
 
 Evict + Time : The attacker saturates a specific part of the cache to force the processor to empty a precise memory address "X". They then ask the system to calculate an HMAC, for example. If the calculation is slower than usual, it means the processor tried to access "X". If the attacker analyzes the source code and finds that address X is only used when the first bit is "1", then they know the first bit. Less precise but it is the simplest to implement because we simply look at whether the victim slows down or not.
 
-### Protocoles cryptographiques
+### Cryptographic protocols
 ### SSL/TLS (Secure Sockets Layer/Transport Layer Security)
 
 Used to create an encrypted and authenticated communication above TCP. 
@@ -1223,7 +1222,7 @@ ClientHello
 ```
 TLS version supported by the client
 Supported cryptographic suites
-Random : a number used to generate sessions key (C'est À DIRE ?)
+Random : a number used to generate sessions key (WHAT DOES THAT MEAN ?)
 Extensions : domain requested, protocol requested (HTTP1/2, etc...)
 ```
 
@@ -1247,7 +1246,7 @@ RSA key exchange or DHE/ECDHE
 
 Table summarizing the different versions : (AI generated)
 
-| Version | Année | Échange de clé   | Authentification    | Chiffrement des données                | Intégrité     | Forward Secrecy   | Vulnérabilités / remarques                |
+| Version | Year  | Key exchange     | Authentication      | Data encryption                        | Integrity     | Forward Secrecy   | Vulnerabilities / remarks                 |
 | ------- | ----- | ---------------- | ------------------- | -------------------------------------- | ------------- | ----------------- | ----------------------------------------- |
 | SSL 2.0 | 1995  | RSA              | RSA                 | RC2, RC4, DES                          | MD5           | No                | Completely broken today                   |
 | SSL 3.0 | 1996  | RSA, DH          | RSA, DSS            | RC4, 3DES, DES                         | MD5, SHA1     | WHAT IS DH ?      | POODLE, downgrade, MAC weak               |
@@ -1281,7 +1280,7 @@ TLS don't do : ECDHE secret = AES key
 
 It use the ECDHE secret to generate multi-keys with a specific use. This process use HKDF (key derivation function based on HMAC).
 
-PLUS DE PRÉCISION
+MORE DETAIL NEEDED
 
 #### Why TLS 1.3 is faster
 
@@ -1392,7 +1391,7 @@ You might think that if Alice sends her public key to Bob, there is no longer an
 
 This is where PKI is usefull. It allows us to certify, through a relationship of trust, that the public key truly belongs to the domain.
 
-#### Certificats X.509
+#### X.509 Certificates
 
 ```
 Subject: www.example.com
@@ -1410,7 +1409,7 @@ Signature: AAAAAAAAAAAAAAAbbbb...
 
 The certificate that the website will provide contains among other, its domain, its public key and the signature of the certification authority (here Let's Encrypt)
 
-#### Autorités de certification
+#### Certificate authorities
 
 The certificate authority signed the certificate with its private key. The certificate authority's public key is provided by the website along with its certificate (the CA certificate). This creates a kind of chain of trust, and ultimately the root CA certificate (there are about ten of them worldwide) is hardcoded into the browser.
 
@@ -1441,11 +1440,11 @@ The most critical situation that cryptography tries to solve is the man-in-the-m
 
 https://www.youtube.com/watch?v=VR-TuXXi3A8
 
-La problématique de l'attaque par bit flipping n'est pas une perte de confidentialité, mais une perte d'intégrité. En effet, les modes de chiffrement par blocs tels que ECB, CBC ou CTR assurent la confidentialité des données, mais ne garantissent pas leur intégrité. Un attaquant capable de modifier le texte chiffré peut provoquer des modifications prévisibles dans le texte clair après déchiffrement.
+The issue with the bit-flipping attack is not a loss of confidentiality, but a loss of integrity. Indeed, block cipher modes such as ECB, CBC or CTR ensure the confidentiality of the data, but do not guarantee its integrity. An attacker capable of modifying the ciphertext can cause predictable changes in the plaintext after decryption.
 
-Pour garantir l'intégrité et l'authenticité des données, il est nécessaire d'utiliser un mécanisme d'authentification tel qu'un MAC (par exemple HMAC) ou, de préférence, un mode d'oppération authentifié comme GCM.
+To guarantee the integrity and authenticity of the data, it is necessary to use an authentication mechanism such as a MAC (for example HMAC) or, preferably, an authenticated mode of operation like GCM.
 
-La problématique est la suivante (exemple pour CBC avec des bloc de 8 bits pour que ça soit plus simple) :
+The problem is as follows (example for CBC with 8-bit blocks to make it simpler) :
 ```
 Data in clear = "admin=0"
 Data in binnary = [ 01100001Data after AES-CBC = [ 01100001
@@ -1471,16 +1470,16 @@ Data after AES-CBC = [ 00101111
                        1111011 0 <----- this is the bit to change to become admin ]
 ```
 
-Ce qu'un attaquant peut faire, c'est inverser la valeur des bit 1 par 1 et renvoyer la données à chaque fois pour tester si il parvient à modifier la valeur.
-Ici c'est d'autant plus simple que c'est le dernier bit qui définit si l'utilisateur est admin ou non. C'est plus compliqué si l'information a modifier est écrite sur plusieurs bit dans un plus grand message.
+What an attacker can do is flip the bit values one by one and resend the data each time to test whether they manage to modify the value.
+Here it's all the easier because it's the last bit that defines whether the user is admin or not. It's more complicated if the information to be modified is written across several bits in a larger message.
 
 #### Padding oracle
 
-Imaginons un algo de chiffrement par block de type AES-CBC mais qui utiliserait des block de max 2 byte (pour la simplicité de l'exemple).
+Let's imagine a block cipher algorithm of the AES-CBC type but that would use blocks of max 2 bytes (for the simplicity of the example).
 
-La gestion du padding en AES suit la convention PKCS#7. (un byte de padding = 01, 2 = 02 etc...).
+Padding management in AES follows the PKCS#7 convention. (one padding byte = 01, 2 = 02 etc...).
 
-Chiffrement :
+Encryption :
 ```
 data_clear_in_hexa = [
     07, e1,
@@ -1500,7 +1499,7 @@ third_block_cipher = encrypt_with_aes( ( third_block XOR second_block_cipher ) ,
 
 ```
 
-Déchiffrement :
+Decryption :
 ```
 first_block_clear = decrypt_with_aes( ( fisrt_block XOR iv) , key) 
 
@@ -1509,13 +1508,13 @@ second_block_clear = decrypt_with_aes( ( second_block XOR first_block_cipher ), 
 third_block_clear = decrypt_with_aes( ( third_block XOR second_block_cipher ), key )
 ```
 
-Le problème arrive lorsqu'on dispose d'un padding oracle. Une vulnérabilité quelquconque dans l'application qui va nous permettre de savoir quand le padding du message chiffré envoyé par l'attaquant est correct.
+The problem arises when we have a padding oracle. Any vulnerability in the application that will allow us to know when the padding of the encrypted message sent by the attacker is correct.
 
-Ce qu'on va pouvoir faire c'est modifier par exemple le dernier des byte du second_block jusqu'a ce qu'on nous indique que le padding est correct. Cela voudra dire que le dernier byte du third_block est "01" seul padding valide possible.
+What we'll be able to do is, for example, modify the last byte of second_block until we are told that the padding is correct. This will mean that the last byte of third_block is "01", the only valid padding possible.
 
-Si on sait que dans la configuration qu'on vient de crée que third_block last byte = "01" alors on peu récupérer en réalisant un XOR entre "01" et la valeur du dernière byte de seconde block (qui à produit ce résultat), la valeur clear du dernier byte.
+If we know that in the configuration we've just created, third_block last byte = "01", then we can recover the clear value of the last byte by performing a XOR between "01" and the value of the last byte of second block (which produced this result).
 
-Exemple :
+Example :
 ```
 data_encrypted = [
     e2, c1,
@@ -1523,7 +1522,7 @@ data_encrypted = [
     a1, a3
 ]
 
-L'attaquant modifie les données ainsi :
+The attacker modifies the data like this :
 
 for I in 255 possibiliy of an byte :
     data_encrypted = [
@@ -1536,7 +1535,7 @@ for I in 255 possibiliy of an byte :
         value_last_byte = I xor "01"
 ```
 
-Pour avoir la valeur des autres byte il suffit d'augmenter la taille du padding :
+To get the value of the other bytes, we just need to increase the size of the padding :
 ```
 for I in 255 possibiliy of an byte :
     data_encrypted = [
@@ -1544,11 +1543,11 @@ for I in 255 possibiliy of an byte :
         I, X,
 ```
 
-Mais pas besoin de 256² possibilité, comme on connait le dernière byte du bloc 2, on sait quoi mettre dans le dernière byte du bloc 1 pour qu'il vallent 02 (X).
+But there's no need for 256² possibilities; since we know the last byte of block 2, we know what to put in the last byte of block 1 so that it equals 02 (X).
 
-Concernant le dernier block, soit le padding est connue ou devinable, soit on peut pas le casser avec cette méthode.
+Regarding the last block, either the padding is known or guessable, or we can't break it with this method.
 
-Démonstration python : (i tried to make it visual using the hexdump functions)
+Python demonstration : (i tried to make it visual using the hexdump functions)
 ```py
 from os import urandom
 
@@ -1642,14 +1641,14 @@ byte in clear : 0xa
 Padding ok      : 75
 byte in clear : 0x1
 ```
-Il y a deux candidat ce qui est normale puisse le padding est également valide avec la valeur original du dernier byte du premier block (4b). En l'occurence quand on résoud l'un d'entre eux avec l'oppération suivante :
+There are two candidates, which is normal since the padding is also valid with the original value of the last byte of the first block (4b). In this case, when we solve one of them with the following operation :
 ```
 (I xor 01) original_value_of_location I = "0xa" 
 ```
 
-0xa = 0a c'est l'byte qu'on cherche qui est en l'occurence du padding.
+0xa = 0a is the byte we're looking for, which in this case is padding.
 
-Script pour tout récupérer :
+Script to recover everything :
 ```py
 def decrypt_block_2(block_1, block_2):
     # Convert the visual hexadecimal (base 16) representation to integer (base 10) table
