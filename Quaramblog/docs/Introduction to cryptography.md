@@ -2,11 +2,11 @@
 
 This article is a tour of modern cryptography, from the math foundations up to the real world protocols like TLS or IPSec. The goal is not to be exhaustive, but to understand how each piece works and why it was built that way.
 
-### Foundations
+## Foundations
 
 Before getting into the algorithms, we need a few math concepts. Nothing too heavy, just the ideas that come back everywhere in cryptography.
 
-#### Number theory
+### Number theory
 Number theory is a field of mathematics that study the integers (1, 5, 2, 6, -2, -8, -6) (not 5.6, 8.9, 1.4).
 
 Here is some key concept for cryptography :
@@ -14,7 +14,7 @@ Here is some key concept for cryptography :
 - A number x is divisible by y if x mod y = 0 (no remainder)
 - Some operation are easy to do but hard to reverse
 
-##### Greatest Common Divisor
+#### Greatest Common Divisor
 GCD = Greatest Common Divisor : the greatest common divisor (that does not leave a remainder) between two numbers
 ```
 Divisor of 12 : 1, 2, 3, 4, 6, 12
@@ -32,7 +32,7 @@ GCD(7, 20) = 1
 (its work because 20 can't be divided by 7)
 ```
 
-##### Modular arithmetic
+#### Modular arithmetic
 Calculating 10¹²⁸ is very time-consuming. But calculating 10¹²⁸ mod 7 is much simpler thanks to modular exponentiation.
 
 Example with 4⁸ mod 10
@@ -45,7 +45,7 @@ Example with 4⁸ mod 10
 36 % 10 = 6
 ```
 
-##### Fermat Theorem
+#### Fermat Theorem
 ```
 (x * 3) mod 101 = 1
 ```
@@ -60,7 +60,7 @@ To find x we can use the Fermat Theorem. The exponent is always (modulus - 2), s
 (34 * 3) mod 101 = 1
 ```
 
-#### Time complexity
+### Time complexity
 
 All cryptographic algorithm can be broken, the only question is "can we do it in a reasonable time". This is why in crypto, we want operations that are easy to perform but difficult to reverse.
 
@@ -71,7 +71,7 @@ Problems are classified according to the time required to solve them :
 - Exponential time problems : For example, the possible combinations of x ASCII characters, used by password security.
 
 
-#### Randomness
+### Randomness
 
 Without randomness a message encrypted, will always give the same result. That's why we use sources of randomness, starting with the key.
 
@@ -79,7 +79,7 @@ We also use salt and noise. We'll look at that in more detail. But the trick her
 
 In algorithm that add real "noise" to the data (random padding like RSA-OAEP), the math is designed so that the legitimate key removes it.
 
-#### Polynomes
+### Polynomes
 Polynomes are objects that allow data (bytes) to be manipulated in a very structured and invertible way.
 
 A binary value can be represented as a polynomial. This allows for many useful operations in cryptography :
@@ -90,11 +90,11 @@ A binary value can be represented as a polynomial. This allows for many useful o
 
 The value of a bit is defined by its position.
 
-### Asymmetric Cryptography
+## Asymmetric Cryptography
 
 Asymmetric cryptography use two keys : a public one to encrypt and a private one to decrypt. Everyone can have your public key, but only you keep the private one.
 
-#### RSA
+### RSA
 Encryption based on the fact that it is difficult to factor the product of two prime numbers without knowing them.
 
 #### Choose two prime numbers p and q
@@ -218,7 +218,7 @@ M = 2
 36 % 10 = 6 # this technique reduces the number of multiplications needed, and some parts can also be computed in parallel.
 ```
 
-#### ECC (Elliptic Curve Cryptography)
+### ECC (Elliptic Curve Cryptography)
 It relies elliptic curves over finite fields. Based on the discrete logarithm problem.
 
 Here is a elliptic curve :
@@ -296,7 +296,7 @@ C = u_1*G + u_2*P
 
 If the signature is authentic, the abscissa (the coordinate x) of point C will be equal to r.
 
-#### Diffie-Hellman
+### Diffie-Hellman
 
 The goal of Diffie-Hellman is to let two people agree on a shared secret over a public channel, without ever sending the secret itself.
 
@@ -328,11 +328,11 @@ They obtain the same secret key, without having shared it.
 
 Today modern version of Diffie Hellman concept use the same concept but with Elliptic curve.
 
-### Symmetric Cryptography
+## Symmetric Cryptography
 
 In symmetric cryptography the same key is used to encrypt and to decrypt. It's fast, but both parties have to share the same secret key beforehand. That's why it combine well with asymmetric cryptography : we use the asymmetric part to exchange the key, then the symmetric part to encrypt the actual data.
 
-#### AES
+### AES
 
 AES (Advanced Encryption Standard) is a symetrical block cipher algorithm. One of the most widely used encryption methods in the world, notably via TLS.
 
@@ -340,7 +340,7 @@ In trivial way, AES is about doing some succesive XOR operations and non-lineari
 
 Here is a more complete description :
 
-### Chose a secret key, different size are allow : 128, 192, 256
+#### Chose a secret key, different size are allow : 128, 192, 256
 ```
 key = 11001010 01110101 11100011 00011010
       10101100 01001111 10010110 11101001
@@ -348,7 +348,7 @@ key = 11001010 01110101 11100011 00011010
       01011011 11110000 00010111 10001101
 ```
 
-### Chose a msg to encrypt
+#### Chose a msg to encrypt
 AES only work with 128 bits block (16 bytes). If the size of the block are to short we will use padding.
 ```
 msg = "A secret"
@@ -373,7 +373,7 @@ msg = [[01000001 00100000 01110011 01100101],
       [00000000 00000000 00000000 00000000]]
 ```
 
-### Caclulate **AddRoundKey**
+#### Caclulate **AddRoundKey**
 ```
 AddRoundKey = msg XOR key
 ```
@@ -406,14 +406,14 @@ AddRoundKey = [['10001011', '01010101', '10010000', '01111111'],
                ['01011011', '11110000', '00010111', '10001101']]
 ```
 
-### AES will then apply turns, each turn containing 4 steps :
+#### AES will then apply turns, each turn containing 4 steps :
 ```
 AES-128 → 10 rounds
 AES-192 → 12 rounds
 AES-256 → 14 rounds
 ```
 
-### Step for one turn :
+#### Step for one turn :
 ```
 SubBytes (S-Box, substitution tables)
 ShiftRows
@@ -618,13 +618,13 @@ RoundKey = is the current AddRoundKey
 
 There are no MixColumns.
 
-### Decryption
+#### Decryption
 We do precisely the exact opposite of the process.
 
-#### Reverse ShiftRows
+##### Reverse ShiftRows
 A shift to the right.
 
-#### Reverse the MixColumns
+##### Reverse the MixColumns
 Based on the well-known matrix with the highest diffusion rate, if we take its reverse (M^-1): M x M^-1 = Identity matrix, which does nothing. So this is how we reverse the MixColumns process:
 ```
 M^-1 = [[0E, 0B, 0D, 09],
@@ -633,10 +633,10 @@ M^-1 = [[0E, 0B, 0D, 09],
         [0B, 0D, 09, 0E]]
 ```
 
-#### Generate the new ReverseRoundKey
+##### Generate the new ReverseRoundKey
 As a xor b = c, and c xor a = b, we can as in the encryption process generate the next round key with a xor. This is why AES is a symetrical encryption algorithm.
 
-#### DES
+### DES
 
 DES (Data Encryption Standard) is an older symmetric block cipher, replaced by AES today. It's still interesting to understand because it works in a very different way.
 
@@ -664,17 +664,17 @@ The real problem with DES is its 56 bits key, way too small today, it can be bru
 
 Based on Feistel (https://www.youtube.com/watch?v=FGhj3CGxl8I)
 
-#### Modes
+### Modes
 In cryptography, a block cipher mode of operation is an algorithm that uses a block cipher to provide information security such as confidentiality or authenticity. A block cipher by itself is only suitable for the secure cryptographic transformation (encryption or decryption) of one fixed-length group of bits called a block. A mode of operation describes how to repeatedly apply a cipher's single-block operation to securely transform amounts of data larger than a block.
 
 DES or AES define how to encrypt a block, but not how to encrypt an entire message. That's the role of modes like CBC and GCM.
 
-##### ECB (Electronic Codebook)
+#### ECB (Electronic Codebook)
 Each block is processed independently, without any connection to the others. If two blocks of text are identical, the repetitions remain visible in the ciphertext, which is very dangerous.
 
 ECB is parallelizable.
 
-##### CBC (Cipher Block Chaining)
+#### CBC (Cipher Block Chaining)
 Each block depends on the previous one. We xor the next block with the current one. The first block is xor with the IV (initial vector) (to prevent issue if first two block are the same in different message).
 
 Not parallelizable.
@@ -683,7 +683,7 @@ The problem is also that an attacker can modify the encrypted message. The syste
 
 CBC is also vulnerable to the padding oracle attack (cf : Padding oracle).
 
-##### CTR (Counter mode)
+#### CTR (Counter mode)
 Instead of encrypting the message directly, the algorithm will encrypt a sequence of numbers (counters) to generate a stream of pseudo-random data, which is called the Keystream (or key stream).
 
 ```
@@ -706,7 +706,7 @@ cipher_msg = cipher_block_1 + cipher_block_2 + cipher_block_3
 
 Parallelizable.
 
-##### GCM (Galois Counter Mode)
+#### GCM (Galois Counter Mode)
 The GCM opperation mode is what we call a AEAD mode (Authenticated Encryption with Associated Data). It's an extension of CTR which also guarantees that the encrypted data have not been modified by an attacker.
 
 GCM add a tag to the message (calculated progressively using the key and the message) so we can verify that the data hasn't been modified while it was encrypted. We don't even attempt decryption if the tag is invalid.
@@ -734,11 +734,11 @@ Where x is the number of cipher block.
 ```
 And this is what makes it parallelizable. This authentication part of GCM is called GMAC (Galois Message Authentication Code).
 
-### Hash functions
+## Hash functions
 
 A hash function take an input of any size and produce a fixed size fingerprint. The same input always give the same output, but you can't go back from the hash to the original data.
 
-#### SHA-1
+### SHA-1
 
 SHA-1 produce a 160 bits hash. It's broken today, but it's a good starting point to understand how the whole family works.
 
@@ -788,7 +788,7 @@ New value of h0, h1, h2, h3, h4 are the hash.
 
 If the message is larger than 512 bits, we will repeat the process with the updated base values ​​(h).
 
-##### What is in the mix function ?
+#### What is in the mix function ?
 ```
 The 512 bits are divided into 16 words of 32 bits:
 W0, W1 ... W15
@@ -816,13 +816,13 @@ Round 40 to 59 : (b AND c) OR (b AND d) OR (c AND d)
 Round 60 to 79 : b xor c xor d
 ```
 
-##### Why these operations ?
+#### Why these operations ?
 These operations have the property of producing an avalanche effect, meaning that even a tiny change in the original chain produces a completely different result. And the irreversibility created by AND and OR means that it's impossible to go back.
 
-##### How were the constants H and Kt chosen?
+#### How were the constants H and Kt chosen?
 They come from the square roots of integers (2, 3, 5, 10) or are simple hexadecimal sequences to prove that there is no "backdoor" in the algorithm.
 
-#### SHA-2
+### SHA-2
 Where SHA-1 is only one algorithm, SHA-2 is a family of hashes containing 32 and 64 bits version :
 SHA-224, SHA-256 : 32 bits version
 SHA-384 and SHA-512 : 64 bits version (most accurate for x64 CPU)
@@ -834,7 +834,7 @@ Size of a block :  512,     1024
 Number of rounds : 64,      80
 ```
 
-##### Here is how SHA-256 works :
+#### Here is how SHA-256 works :
 
 The generation of the size and the padding is exactly like SHA1
 
@@ -924,7 +924,7 @@ x >>> 2 = right rotation of 2
 01001 >>> 2 = 01010
 ```
 
-#### SHA-3
+### SHA-3
 
 SHA-3 is the most recent member of the family, and it works in a completely different way from SHA-1 and SHA-2. It use a structure called a sponge.
 
@@ -962,7 +962,7 @@ for 24 rounds :
 
 If the message was larger than the part r, the operation is repeated with what remains and so on in blocks of size r.
 
-##### Details of the operations:
+#### Details of the operations:
 
 Theta :
 For each bit of the cube, we look at the 2 columns surrounding it. We perform an XOR operation on all the bits in these columns, and add the result to the central bit.
@@ -1040,13 +1040,13 @@ a = [ 0, 0, 1, 0, 0 ]
 Iota :
 We take a constant which is different each round, and we do an XOR only on the very first thread of the cube (the 0,0 square and the 64 bits of its depth).
 
-##### Squeezing step (to retrieve the hash)
+#### Squeezing step (to retrieve the hash)
 
 In SHA3-256 we want a 256 bits hash, so we will take the first 256 bits of the r part of our sponge (in this order : wires (64 bits depth), lines, columns).
 
 If we want a hash larger than r, we can save r, re-perform the 24 steps and thus generate a new r to feed our large hash.
 
-#### Salt
+### Salt
 Without salt, if two users choose the same password, their hashes in the database will be identical. A hacker with a Rainbow Table (a list of pre-calculated hashes) could then identify the passwords instantly.
 
 ```
@@ -1061,7 +1061,7 @@ The purpose of the salt is not to be secret. Its purpose is to make mass diction
 
 Ideally, there should be one salt per user.
 
-#### Pepper
+### Pepper
 It is added to hash like salt, but it is unique and kept secret in a config file or a vault.
 
 ```
@@ -1072,7 +1072,7 @@ hash in the database = $salt$hashed_value (no pepper)
 
 When the application wants to verify the hash, it retrieves the pepper and performs the calculation. Therefore, if the database is leaked, the attacker will need the additional pepper to crack the hashes.
 
-#### HMAC
+### HMAC
 Used in JWTS when we want a stateless authentification, for example :
 ```
 {role: "user", signature}
@@ -1100,20 +1100,20 @@ opad (outer padding): A repeated constant (0x5c)
 
 To verify a message we recalculates the HMAC.
 
-##### Why ipad and opad ?
+#### Why ipad and opad ?
 cf : Length Extension attack
 
-#### Hash vulnerabilities and Attack
-##### Pre-image attack
+### Hash vulnerabilities and Attack
+#### Pre-image attack
 This is what attackers actually do when they want to "break/crack" hashes. They want to recover the original value from the hash.
 
-###### Dictionary attack
+##### Dictionary attack
 From a list of common passwords (rockyou for example) an attacker will hash them and compare them with the hash to recover.
 
-###### Brute Force attack
+##### Brute Force attack
 The same thing but without a list and by testing all possible combinations of characters over a defined length.
 
-###### Rainbow Tables attack
+##### Rainbow Tables attack
 Here the attacker will use a pre-calculated hash table.
 ```
 hello = 5d41402abc4b2a76b9719d911017c592
@@ -1122,14 +1122,14 @@ toto = f71dbe52628a3f83a77ab494817525c6
 
 This attack is useless if salt is used correctly.
 
-##### Collision
+#### Collision
 If two different inputs, produce the same result when passed through a hashing algorithm, then a collision has occurred.
 
 Even though it is statistically very rare, certain algorithms (md4, md5, sha1) have known collisions, and this is one of the reasons why they should no longer be used.
 
 Obviously collisions are mathematically obligatory, because a chain of fixed length cannot contain as many possibilities as chains of theoretically infinite length.
 
-##### Second pre-image attack
+#### Second pre-image attack
 This is a collision-related attack. The attacker already have a message and is hash. The goal is to find a different message that produce the same hash. The goal here is to create an undetectable substitution.
 
 Imagine a contract that says :
@@ -1143,7 +1143,7 @@ let's imagine that :
 "transaction bob -> anotheraccount of 5$" hashed value is also 1824ea103e837b8558a18f17c8104b9f
 ```
 
-##### Length Extension attack
+#### Length Extension attack
 If we hash "abc" using an algorithm like SHA-256
 
 Let's assume that one letter = one block for simplicity in this example.
@@ -1196,10 +1196,10 @@ HMAC(K, m) =
      )
 ```
 
-##### To fast hashing method
+#### To fast hashing method
 Some hashing methods are too fast (like sha256), which makes them easier for an attacker to calculate. This is why the latest recommendations are to use a slower hashing method like Argon2.
 
-##### Birthday Attack
+#### Birthday Attack
 There is a higher probability of collision than we think. The name of this attack comes from the birthday paradox in probability, where in a group of 23 people there is already more than a 50% chance that two people have the same birthday. This phenomenon seems counterintuitive, but it is based on the fact that we compare all possible pairs, not just one person against all others.
 
 A hashes of a maximum of 8 bits
@@ -1217,17 +1217,17 @@ With each new_hash generated:
 
 The number of comparisons increases very quickly, and so the probability of a collision.
 
-##### Side-channel attack
+#### Side-channel attack
 These flaws are not based on the algorithms themselves but primarily on their implementation and their confrontation with reality.
 
-###### Timing
+##### Timing
 When a password is hashed and compared to the one in the database, if the loop compares characters one by one and stops when a different one is found, then the hash in the database can be guessed based on the timing.
 
 The fact that internet requests tend to dilute this delay doesn't prevent an attacker from repeating the process multiple times and statistically discovering the data. Furthermore, they can rent a VM in the same data center.
 
 To avoid this, fixed-time comparison functions must be used.
 
-###### Power analysis
+##### Power analysis
 A computer consumes more electricity when it processes 1s (5 volts) than 0s (0 volts), that's why by analyzing the electrical consumption we can guess the secret.
 
 When the processor performs a calculation: SHA-256(message) The transistors change state this creates electricity variations. These variations can reveal: internal bits, state of the calculation, secret key (in HMAC).
@@ -1238,13 +1238,13 @@ Direct observation of the electrical curve. Some conditional branches create rec
 Differential Power Analysis :
 Collects thousands of electrical traces, applies statistics, correlates the traces with hypotheses about internal data.
 
-###### Electromagnetic attacks
+##### Electromagnetic attacks
 Instead of measuring the electricity power : we measure the electromagnetic radiation emitted by the CPU.
 
-###### Acoustic attacks
+##### Acoustic attacks
 Some physical operations produce microscopic vibrations or sounds and even a hash calculation can produce a usable acoustic signal.
 
-###### Cache attacks
+##### Cache attacks
 The processor uses a cache to speed up data access. If data is in the cache, access is fast. If not, the processor has to retrieve it from RAM, which is slower. The attacker can measures these time differences to deduce which data has been accessed by the victim.
 
 The goal here is not to read the data used by the victim, but to know which memory address they used. Because the attacker knows, by analyzing the source code of the hashing function (which is public), that, for example :
@@ -1261,7 +1261,7 @@ Prime + Probe : The attacker fills the cache with their own data. They let the v
 
 Evict + Time : The attacker saturates a specific part of the cache to force the processor to empty a precise memory address "X". They then ask the system to calculate an HMAC, for example. If the calculation is slower than usual, it means the processor tried to access "X". If the attacker analyzes the source code and finds that address X is only used when the first bit is "1", then they know the first bit. Less precise but it is the simplest to implement because we simply look at whether the victim slows down or not.
 
-### Cryptographic protocols
+## Cryptographic protocols
 
 Now that we have the building blocks (asymmetric, symmetric, hashes), let's see how they are combined into real world protocols.
 
@@ -1487,15 +1487,15 @@ The method used today is OCSP Stapling. This time, the server will periodically 
 
 All Certificate Authorities (CAs) must publish the certificates they issue in public logs to prevent fraudulent validation. To ensure this transparency, when connecting to a website, the browser also verifies that the certificate is recorded on the correct date in these logs.
 
-### Attacks
+## Attacks
 
 This section regroup some classic attacks. A few of them were already mentioned along the way, here we look at them in more detail.
 
-#### Man-in-the-middle
+### Man-in-the-middle
 
 The most critical situation that cryptography tries to solve is the man-in-the-middle case. When someone between Bob and Alice can view and change the packet they exchange. The best workaround to solve this problem is the Diffie–Hellman key exchange.
 
-#### Bit-flipping attack
+### Bit-flipping attack
 
 https://www.youtube.com/watch?v=VR-TuXXi3A8
 
@@ -1527,7 +1527,7 @@ Data after AES-CBC = [ 00101111
 What an attacker can do is flip the bit values one by one and resend the data each time to test whether they manage to modify the value.
 Here it's all the easier because it's the last bit that defines whether the user is admin or not. It's more complicated if the information to be modified is written across several bits in a larger message.
 
-#### Padding oracle
+### Padding oracle
 
 Let's imagine a block cipher algorithm of the AES-CBC type but that would use blocks of max 2 bytes (for the simplicity of the example).
 
