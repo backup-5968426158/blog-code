@@ -1,5 +1,11 @@
 # Introduction to cryptography
+
+This article is a tour of modern cryptography, from the math foundations up to the real world protocols like TLS or IPSec. The goal is not to be exhaustive, but to understand how each piece works and why it was built that way.
+
 ### Foundations
+
+Before getting into the algorithms, we need a few math concepts. Nothing too heavy, just the ideas that come back everywhere in cryptography.
+
 #### Number theory
 Number theory is a field of mathematics that study the integers (1, 5, 2, 6, -2, -8, -6) (not 5.6, 8.9, 1.4).
 
@@ -35,23 +41,23 @@ Example with 4⁸ mod 10
 4 ** 4 = (4 ** 2) ** 2 = 16 ** 2 = 256
 256 % 10 = 6
 
-4 ** 8 (4 ** 4) ** 2 = Here there's no need to calculate the result, since we already know that 4 ** 4 mod 10 = 6, we can do 6 ** 2 = 36
+4 ** 8 = (4 ** 4) ** 2 = Here there's no need to calculate the result, since we already know that 4 ** 4 mod 10 = 6, we can do 6 ** 2 = 36
 36 % 10 = 6
 ```
 
 ##### Fermat Theorem
 ```
-(x * 2) mod 101 = 1
+(x * 3) mod 101 = 1
 ```
 
-To find x we can use the Fermat Theorem :
+To find x we can use the Fermat Theorem. The exponent is always (modulus - 2), so here 101-2 = 99 :
 ```
-2 ** (101-2)
-2 ** 99 = 633825300114114700748351602688
-633825300114114700748351602688 % 101 = 51
+3 ** (101-2)
+3 ** 99 = 171792506910670443678820376588540424234035840667
+171792506910670443678820376588540424234035840667 % 101 = 34
 ```
 ```
-(51 * 2) mod 101 = 1
+(34 * 3) mod 101 = 1
 ```
 
 #### Time complexity
@@ -69,10 +75,9 @@ Problems are classified according to the time required to solve them :
 
 Without randomness a message encrypted, will always give the same result. That's why we use sources of randomness, starting with the key.
 
-- salt
-- noise
+We also use salt and noise. We'll look at that in more detail. But the trick here is that the randomness is never lost, it is either transmitted or cancelled out. Values like the salt, the IV or the nonce are not secret: they are stored or sent alongside the ciphertext, so the receiver has them at decryption time and can reproduce the exact same computation. 
 
-The trick is that the randomness is never *lost*, it is either **transmitted** or **cancelled out**. Values like the salt, the IV or the nonce are *not* secret: they are stored or sent alongside the ciphertext, so the receiver has them at decryption time and can reproduce the exact same computation. In schemes that genuinely add "noise" to the data (random padding like RSA-OAEP, or the error term in modern lattice-based crypto), the math is designed so that the legitimate key removes it, for example OAEP recovers then discards the random padding, and in lattice schemes the noise is kept small enough that decryption simply rounds it away. So randomness changes the ciphertext every time without ever blocking decryption.
+In algorithm that add real "noise" to the data (random padding like RSA-OAEP), the math is designed so that the legitimate key removes it.
 
 #### Polynomes
 Polynomes are objects that allow data (bytes) to be manipulated in a very structured and invertible way.
@@ -83,7 +88,12 @@ A binary value can be represented as a polynomial. This allows for many useful o
 0 * x⁷ + 1 * x⁶ + 0 * x⁵ + 0 * x⁴ + 0 * x³ + 0 * x² + 0 * x¹ + 1 * x⁰
 ```
 
+The value of a bit is defined by its position.
+
 ### Asymmetric Cryptography
+
+Asymmetric cryptography use two keys : a public one to encrypt and a private one to decrypt. Everyone can have your public key, but only you keep the private one.
+
 #### RSA
 Encryption based on the fact that it is difficult to factor the product of two prime numbers without knowing them.
 
@@ -115,7 +125,7 @@ phi(N) = 120
 
 #### Find e
 
-Such that ``e`` is coprime with ``phi(N)``; ``e`` and ``phi(N)`` must not share any common divisor other than 1.
+Such that e is coprime with phi(N); e and phi(N) must not share any common divisor other than 1.
 
 ```
 2 is divisible by 2 and so is 120 | NO
@@ -157,6 +167,7 @@ To do this, we will test the multiples of 120 + 1:
 ```
 
 ---
+
 ```
 d = 103
 
@@ -197,7 +208,7 @@ $ python3
 M = 2
 ```
 
-128 to the power of 103 yields a massive result. To compute it, instead of doing ``128*128*128 etc...``, computers use a technique called modular exponentiation. Here is an example with 4 to the power of 8 mod 10:
+128 ** 103 create a massive result. To compute it, instead of doing ``128*128*128 etc...``, computers use a technique called modular exponentiation. Here is an example with 4 to the power of 8 mod 10:
 ```
 4 ** 2 = 16
 4 ** 4 = (4 ** 2) ** 2 = 16 ** 2 = 256
@@ -236,13 +247,18 @@ We can call this "A+A" point P.
 
 With only P and A. If you want to know how many times A has been added to itself, you have to recalculate and check if the result is correct. Here, in this case, it's simple because it's only done once. But if you repeat it 1578 times, you have to perform 1578 additions and check if the result is correct.
 
-*But does that mean it takes the same amount of time for the attacker and for us to calculate the result ?* - No, and here is why.
+*But does that mean it takes the same amount of time for the attacker and for us to calculate the result ?* No, and here is why.
 
-If you want to calculate Ax8, instead of adding the two points (P and A), you can directly add P (A+A) to itself to get A+A+A+A (Ax4). Then you add Ax4 to itself to get Ax8. An attacker won't be able to do it this way because they risk missing the intermediate values (Ax3, Ax6) ​​that might contain the correct result.
+If you want to calculate Ax8, instead of adding A again and again, you can double : add P (A+A) to itself to get Ax4, then double Ax4 to get Ax8. We can use this shortcut because we know the number of additions in advance, that number is the private key.
+
+The attacker only sees the start point A and the final point, and wants to recover that number. They can't use the doubling shortcut, because it only lands on Ax2, Ax4, Ax8... and would jump over the real value. So they are stuck adding A one step at a time and checking, at each step, if they reached the final point. With a very large number this is impossible in a reasonable time.
 
 This is what is called the discrete logarithm problem.
 
 ### Sign with ECDSA
+
+ECDSA is the signature scheme built on top of elliptic curves. The goal is to prove that a message really comes from the owner of the private key, without ever revealing it. Here are the elements we work with :
+
 G = generator, point on the curve
 e = private key, large number
 P = public key, G*e on the elliptic curve
@@ -281,6 +297,9 @@ C = u_1*G + u_2*P
 If the signature is authentic, the abscissa (the coordinate x) of point C will be equal to r.
 
 #### Diffie-Hellman
+
+The goal of Diffie-Hellman is to let two people agree on a shared secret over a public channel, without ever sending the secret itself.
+
 We agree on public values:
 ```
 p = a prime number
@@ -310,6 +329,9 @@ They obtain the same secret key, without having shared it.
 Today modern version of Diffie Hellman concept use the same concept but with Elliptic curve.
 
 ### Symmetric Cryptography
+
+In symmetric cryptography the same key is used to encrypt and to decrypt. It's fast, but both parties have to share the same secret key beforehand. That's why it combine well with asymmetric cryptography : we use the asymmetric part to exchange the key, then the symmetric part to encrypt the actual data.
+
 #### AES
 
 AES (Advanced Encryption Standard) is a symetrical block cipher algorithm. One of the most widely used encryption methods in the world, notably via TLS.
@@ -376,7 +398,7 @@ C = [ 1111 0110 ]
 ```
 
 ```
-AddRoundKey result for our key and msg (retrieve with a vibe coded script) :
+AddRoundKey result for our key and msg (retrieve with a vibe-coded script) :
 
 AddRoundKey = [['10001011', '01010101', '10010000', '01111111'],
                ['11001111', '00111101', '11110011', '10011101'],
@@ -408,7 +430,7 @@ We have a corresponding table. For each byte of our msg we will get the correspo
 01110011 -> 00011010
 ```
 
-In this exemple i use some random value, but in fact the substitution table is generated in a very specific way. The AES S-Box is a table of 256 entries, one for each possible value of a byte (0 to 255).
+In this exemple I use some random value, but in fact the substitution table is generated in a very specific way. The AES S-Box is a table of 256 entries, one for each possible value of a byte (0 to 255).
 
 Example with 01000001 (41) :
 ```
@@ -492,9 +514,8 @@ That mean if you only know a part of the message, or with many message you can e
 The S-Box break the proprety :
 ```
 S(a xor b) != S(a) xor S(b)
-
-In fact relation between the original value and the value inside of the S-Box are non-linear.
 ```
+Relation between the original value and the value inside of the S-Box are non-linear.
 
 #### ShiftRows
 
@@ -603,8 +624,6 @@ We do precisely the exact opposite of the process.
 #### Reverse ShiftRows
 A shift to the right.
 
-#### Get the original value in the S-Box
-
 #### Reverse the MixColumns
 Based on the well-known matrix with the highest diffusion rate, if we take its reverse (M^-1): M x M^-1 = Identity matrix, which does nothing. So this is how we reverse the MixColumns process:
 ```
@@ -619,6 +638,30 @@ As a xor b = c, and c xor a = b, we can as in the encryption process generate th
 
 #### DES
 
+DES (Data Encryption Standard) is an older symmetric block cipher, replaced by AES today. It's still interesting to understand because it works in a very different way.
+
+Where AES is a substitution-permutation network (the whole block goes through SubBytes, ShiftRows, MixColumns), DES is built on a Feistel network. Instead of transforming the whole block at once, the block is split in two halves. At each round only one half is modified (mixed with the key through a function), then the two halves are swapped.
+
+```
+L, R = left half, right half
+
+for each round :
+    L, R = R, L XOR f(R, key)
+```
+
+The nice property of Feistel is that decryption use exactly the same structure as encryption, just with the round keys in reverse order. The function `f` doesn't even need to be reversible, which isn't the case for the AES steps.
+
+The main differences with AES :
+```
+                DES              AES
+Block size :    64 bits          128 bits
+Key size :      56 bits          128, 192 or 256 bits
+Rounds :        16               10, 12 or 14
+Structure :     Feistel network  Substitution-permutation
+```
+
+The real problem with DES is its 56 bits key, way too small today, it can be brute-forced. 3DES (applying DES three times) was used as a patch, but AES replaced everything.
+
 Based on Feistel (https://www.youtube.com/watch?v=FGhj3CGxl8I)
 
 #### Modes
@@ -626,12 +669,10 @@ In cryptography, a block cipher mode of operation is an algorithm that uses a bl
 
 DES or AES define how to encrypt a block, but not how to encrypt an entire message. That's the role of modes like CBC and GCM.
 
-https://www.youtube.com/watch?v=Rk0NIQfEXBA
-
 ##### ECB (Electronic Codebook)
 Each block is processed independently, without any connection to the others. If two blocks of text are identical, the repetitions remain visible in the ciphertext, which is very dangerous.
 
-Parallelizable.
+ECB is parallelizable.
 
 ##### CBC (Cipher Block Chaining)
 Each block depends on the previous one. We xor the next block with the current one. The first block is xor with the IV (initial vector) (to prevent issue if first two block are the same in different message).
@@ -672,7 +713,7 @@ GCM add a tag to the message (calculated progressively using the key and the mes
 
 To do this, we will generate H such as :
 ```
-null_128_bits = 000000(...) (128 0)
+null_128_bits = 000000(...) (128 zeros)
 H = cipher(null_128_bits, symmetrical_key)
 ```
 
@@ -694,8 +735,14 @@ Where x is the number of cipher block.
 And this is what makes it parallelizable. This authentication part of GCM is called GMAC (Galois Message Authentication Code).
 
 ### Hash functions
+
+A hash function take an input of any size and produce a fixed size fingerprint. The same input always give the same output, but you can't go back from the hash to the original data.
+
 #### SHA-1
-Based on the Merkle-Damgård structure (TO WRITE).
+
+SHA-1 produce a 160 bits hash. It's broken today, but it's a good starting point to understand how the whole family works.
+
+Based on the Merkle-Damgård structure.
 
 SHA-1 allows hashing blocks of 512 bits. If our block is smaller than 512 bits, we add padding like this:
 ```
@@ -878,7 +925,10 @@ x >>> 2 = right rotation of 2
 ```
 
 #### SHA-3
-Based on the Keccak algorithm (TO WRITE).
+
+SHA-3 is the most recent member of the family, and it works in a completely different way from SHA-1 and SHA-2. It use a structure called a sponge.
+
+Based on the Keccak algorithm.
 
 Padding management :
 ```
@@ -995,8 +1045,6 @@ We take a constant which is different each round, and we do an XOR only on the v
 In SHA3-256 we want a 256 bits hash, so we will take the first 256 bits of the r part of our sponge (in this order : wires (64 bits depth), lines, columns).
 
 If we want a hash larger than r, we can save r, re-perform the 24 steps and thus generate a new r to feed our large hash.
-
-#### Argon2
 
 #### Salt
 Without salt, if two users choose the same password, their hashes in the database will be identical. A hacker with a Rainbow Table (a list of pre-calculated hashes) could then identify the passwords instantly.
@@ -1207,13 +1255,16 @@ The goal here is not to read the data used by the victim, but to know which memo
 
 Flush + Reload : The attacker clears a specific cache entry. They wait for the victim to execute the command, then reload the data. If they reload it quickly, it means the victim has used it. Very precise, but requires sharing files (libraries) with the victim.
 
-Flush + Reload only works because the attacker and the victim share the same physical memory (a common library mapped into both processes). The attacker flushes one specific cache line (one entry of a lookup table inside that shared library), so it now lives only in RAM. The victim then runs; if its code touches that exact address (a secret-dependent lookup), the CPU caches it again. The attacker finally reads the same address and times it : fast means it was already cached, so the victim used it; slow means it came from RAM, so it didn't. Because both processes see the *same* cache line, the attacker learns which secret-dependent address the victim accessed, and that shared memory is exactly why the attack needs a shared file.
+Flush + Reload only works because the attacker and the victim share the same physical memory (a common library mapped into both processes). The attacker flushes one specific cache line (one entry of a lookup table inside that shared library), so it now lives only in RAM. The victim then runs; if its code touches that exact address (a secret-dependent lookup), the CPU caches it again. The attacker finally reads the same address and times it : fast means it was already cached, so the victim used it; slow means it came from RAM, so it didn't. Because both processes see the same cache line, the attacker learns which secret-dependent address the victim accessed, and that shared memory is exactly why the attack needs a shared file.
 
 Prime + Probe : The attacker fills the cache with their own data. They let the victim execute. If the attacker's access to their own data is subsequently slow, it means the victim has "expelled" their data to use that cache space. Precise, requires sharing the same processor, but you monitor your own data.
 
 Evict + Time : The attacker saturates a specific part of the cache to force the processor to empty a precise memory address "X". They then ask the system to calculate an HMAC, for example. If the calculation is slower than usual, it means the processor tried to access "X". If the attacker analyzes the source code and finds that address X is only used when the first bit is "1", then they know the first bit. Less precise but it is the simplest to implement because we simply look at whether the victim slows down or not.
 
 ### Cryptographic protocols
+
+Now that we have the building blocks (asymmetric, symmetric, hashes), let's see how they are combined into real world protocols.
+
 ### SSL/TLS (Secure Sockets Layer/Transport Layer Security)
 
 Used to create an encrypted and authenticated communication above TCP. 
@@ -1254,7 +1305,7 @@ Table summarizing the different versions : (AI generated)
 | Version | Year  | Key exchange     | Authentication      | Data encryption                        | Integrity     | Forward Secrecy   | Vulnerabilities / remarks                 |
 | ------- | ----- | ---------------- | ------------------- | -------------------------------------- | ------------- | ----------------- | ----------------------------------------- |
 | SSL 2.0 | 1995  | RSA              | RSA                 | RC2, RC4, DES                          | MD5           | No                | Completely broken today                   |
-| SSL 3.0 | 1996  | RSA, DH          | RSA, DSS            | RC4, 3DES, DES                         | MD5, SHA1     | WHAT IS DH ?      | POODLE, downgrade, MAC weak               |
+| SSL 3.0 | 1996  | RSA, DH          | RSA, DSS            | RC4, 3DES, DES                         | MD5, SHA1     | Possible      | POODLE, downgrade, MAC weak               |
 | TLS 1.0 | 1999  | RSA, DHE         | RSA, DSA            | RC4, 3DES, AES                         | HMAC-MD5/SHA1 | Possible          | BEAST, CBC attacks                        |
 | TLS 1.1 | 2006  | RSA, DHE         | RSA, DSA            | AES, 3DES                              | HMAC-SHA1     | Possible          | Corrects some CBC attacks                 |
 | TLS 1.2 | 2008  | RSA, DHE, ECDHE  | RSA, ECDSA          | AES-GCM, ChaCha20, AES-CBC             | SHA256/384    | Possible          | Dominant modern version                   |
@@ -1277,7 +1328,7 @@ Beyond the fact that the early versions used cryptographic methods that are no l
 
 POODLE : (Padding Oracle On Downgraded Legacy Encryption) is an attack where an attacker (in MITM position) intentionally causes the TLS handshake to fail. At the time, browsers implemented an automatic protocol fallback mechanism: when a handshake failed, they would retry with older versions of TLS/SSL, assuming the server did not support modern versions. Once the connection is downgraded, the attacker exploits a weakness in CBC operation mode and padding management (cf : padding oracle attack), allowing them to retrieve data.
 
-BEAST : TO REDACT
+BEAST : (Browser Exploit Against SSL/TLS) is a chosen-plaintext attack against CBC in TLS 1.0 (cf : CBC). In TLS 1.0 the IV is predictable (it's the previous ciphertext block). By knowing the IV in advance and injecting chosen plaintext, the attacker cancels the chaining and turns CBC back into ECB, which let him guess a secret like a session cookie byte by byte. Fixed in TLS 1.1 with a fresh unpredictable IV per record.
 
 #### Key Schedule TLS 1.3
 
@@ -1285,7 +1336,9 @@ TLS don't do : ECDHE secret = AES key
 
 It use the ECDHE secret to generate multi-keys with a specific use. This process use HKDF (key derivation function based on HMAC).
 
-HKDF works in two steps. **Extract** turns the ECDHE secret into one uniform pseudo-random key (PRK), then **Expand** derives several independent sub-keys from that PRK, each bound to a distinct label. TLS 1.3 chains this through successive stages (Early Secret, derived from a PSK, then Handshake Secret, which mixes in the ECDHE secret, then Master Secret), and from each stage it derives purpose-specific keys : client and server handshake traffic keys, application traffic keys, exporter and resumption secrets. Each key serves a single purpose and the labels keep them cryptographically separated, so compromising one never exposes the others.
+HKDF works in two steps. Extract turns the ECDHE secret into one uniform pseudo-random key (PRK).
+
+Then expand derives several independent sub-keys from that PRK, each bound to a distinct label. TLS 1.3 chains this through successive stages (Early Secret, derived from a PSK, then Handshake Secret, which mixes in the ECDHE secret, then Master Secret), and from each stage it derives purpose-specific keys : client and server handshake traffic keys, application traffic keys, exporter and resumption secrets. Each key serves a single purpose and the labels keep them cryptographically separated, so compromising one never exposes the others.
 
 #### Why TLS 1.3 is faster
 
@@ -1381,8 +1434,6 @@ Because IPsec is designed to secure IP traffic at Layer 3. ESP therefore operate
 
 Defines which traffic must be protected and which traffic should be bypassed or discarded in a config file in the routeur.
 
-### SSH
-
 ### PKI
 Public key infrastructure design a set of techniques and organization to guarantee the identity of entities through cryptographic techniques.
 
@@ -1437,6 +1488,9 @@ The method used today is OCSP Stapling. This time, the server will periodically 
 All Certificate Authorities (CAs) must publish the certificates they issue in public logs to prevent fraudulent validation. To ensure this transparency, when connecting to a website, the browser also verifies that the certificate is recorded on the correct date in these logs.
 
 ### Attacks
+
+This section regroup some classic attacks. A few of them were already mentioned along the way, here we look at them in more detail.
+
 #### Man-in-the-middle
 
 The most critical situation that cryptography tries to solve is the man-in-the-middle case. When someone between Bob and Alice can view and change the packet they exchange. The best workaround to solve this problem is the Diffie–Hellman key exchange.
@@ -1452,13 +1506,8 @@ To guarantee the integrity and authenticity of the data, it is necessary to use 
 The problem is as follows (example for CBC with 8-bit blocks to make it simpler) :
 ```
 Data in clear = "admin=0"
-Data in binnary = [ 01100001Data after AES-CBC = [ 01100001
-                       01100100
-                       01101101
-                       01101001
-                       01101110
-                       00111101
-                       00110000 ]
+
+Data in binnary = [ 01100001
                     01100100
                     01101101
                     01101001
@@ -1472,7 +1521,7 @@ Data after AES-CBC = [ 00101111
                        01101001
                        01101110
                        10101101
-                       1111011 0 <----- this is the bit to change to become admin ]
+                       11110110 ]  <----- last bit to flip to become admin
 ```
 
 What an attacker can do is flip the bit values one by one and resend the data each time to test whether they manage to modify the value.
@@ -1506,11 +1555,11 @@ third_block_cipher = encrypt_with_aes( ( third_block XOR second_block_cipher ) ,
 
 Decryption :
 ```
-first_block_clear = decrypt_with_aes( ( fisrt_block XOR iv) , key) 
+first_block_clear = decrypt_with_aes( first_block_cipher, key ) XOR iv
 
-second_block_clear = decrypt_with_aes( ( second_block XOR first_block_cipher ), key ) 
+second_block_clear = decrypt_with_aes( second_block_cipher, key ) XOR first_block_cipher
 
-third_block_clear = decrypt_with_aes( ( third_block XOR second_block_cipher ), key )
+third_block_clear = decrypt_with_aes( third_block_cipher, key ) XOR second_block_cipher
 ```
 
 The problem arises when we have a padding oracle. Any vulnerability in the application that will allow us to know when the padding of the encrypted message sent by the attacker is correct.
