@@ -495,8 +495,6 @@ b = constant 01100011
 S(01000001) = 10000011
 ```
 
-`A` and `b` aren't chosen randomly. `A` is the fixed circulant matrix obtained by rotating the bit pattern `10001111`, which means each output bit is `bᵢ ⊕ b₍ᵢ₊₄₎ ⊕ b₍ᵢ₊₅₎ ⊕ b₍ᵢ₊₆₎ ⊕ b₍ᵢ₊₇₎` (indices mod 8). The constant `b = 01100011 = 0x63` is fixed by the standard. This pair was selected so that the S-box stays reversible (`A` is invertible) and has no fixed point (`S(a) ≠ a`) nor opposite fixed point (`S(a) ≠ ā`), which removes the algebraic regularities an attacker could exploit. The calculation itself is just that : for each bit of `B(x)`, XOR it with four other bits at fixed offsets, then XOR the constant `0x63`.
-
 In practice, this isn't calculated manually. We use either a pre-calculated S-box table or an exponentiation algorithm in GF.
 
 There's an inverse S-box to reverse the process.
@@ -661,8 +659,6 @@ Structure :     Feistel network  Substitution-permutation
 ```
 
 The real problem with DES is its 56 bits key, way too small today, it can be brute-forced. 3DES (applying DES three times) was used as a patch, but AES replaced everything.
-
-Based on Feistel (https://www.youtube.com/watch?v=FGhj3CGxl8I)
 
 ### Modes
 In cryptography, a block cipher mode of operation is an algorithm that uses a block cipher to provide information security such as confidentiality or authenticity. A block cipher by itself is only suitable for the secure cryptographic transformation (encryption or decryption) of one fixed-length group of bits called a block. A mode of operation describes how to repeatedly apply a cipher's single-block operation to securely transform amounts of data larger than a block.
@@ -1496,8 +1492,6 @@ This section regroup some classic attacks. A few of them were already mentioned 
 The most critical situation that cryptography tries to solve is the man-in-the-middle case. When someone between Bob and Alice can view and change the packet they exchange. The best workaround to solve this problem is the Diffie–Hellman key exchange.
 
 ### Bit-flipping attack
-
-https://www.youtube.com/watch?v=VR-TuXXi3A8
 
 The issue with the bit-flipping attack is not a loss of confidentiality, but a loss of integrity. Indeed, block cipher modes such as ECB, CBC or CTR ensure the confidentiality of the data, but do not guarantee its integrity. An attacker capable of modifying the ciphertext can cause predictable changes in the plaintext after decryption.
 
