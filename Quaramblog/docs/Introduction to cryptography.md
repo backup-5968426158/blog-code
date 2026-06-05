@@ -4,8 +4,8 @@
 Number theory is a field of mathematics that study the integers (1, 5, 2, 6, -2, -8, -6) (not 5.6, 8.9, 1.4).
 
 Here is some key concept for cryptography :
-- A prime number can only be divided by 1 and himself
-- A number x is qualify has divisable with y if x mod q = 0 (no rest)
+- A prime number can only be divided by 1 and itself
+- A number x is divisible by y if x mod y = 0 (no remainder)
 - Some operation are easy to do but hard to reverse
 
 ##### Greatest Common Divisor
@@ -27,7 +27,7 @@ GCD(7, 20) = 1
 ```
 
 ##### Modular arithmetic
-Calculating 10¹²⁸ is very time-consuming. But calculating 10¹²⁸ mod 5 is much simpler thanks to modular exponentiation.
+Calculating 10¹²⁸ is very time-consuming. But calculating 10¹²⁸ mod 7 is much simpler thanks to modular exponentiation.
 
 Example with 4⁸ mod 10
 ```
@@ -71,7 +71,8 @@ Without randomness a message encrypted, will always give the same result. That's
 
 - salt
 - noise
-??? how do we get back to the result during decryption if we add noise ?
+
+The trick is that the randomness is never *lost*, it is either **transmitted** or **cancelled out**. Values like the salt, the IV or the nonce are *not* secret: they are stored or sent alongside the ciphertext, so the receiver has them at decryption time and can reproduce the exact same computation. In schemes that genuinely add "noise" to the data (random padding like RSA-OAEP, or the error term in modern lattice-based crypto), the math is designed so that the legitimate key removes it, for example OAEP recovers then discards the random padding, and in lattice schemes the noise is kept small enough that decryption simply rounds it away. So randomness changes the ciphertext every time without ever blocking decryption.
 
 #### Polynomes
 Polynomes are objects that allow data (bytes) to be manipulated in a very structured and invertible way.
@@ -203,7 +204,7 @@ M = 2
 256 % 10 = 6
 
 4 ** 8 (4 ** 4) ** 2 = no need to calculate the full result here; since we already know that 4 ** 4 mod 10 = 6, we can simply do 6 ** 2 = 36
-36 % 10 = 6 # this technique allows the computer to parallelize the calculation.
+36 % 10 = 6 # this technique reduces the number of multiplications needed, and some parts can also be computed in parallel.
 ```
 
 #### ECC (Elliptic Curve Cryptography)
@@ -465,14 +466,14 @@ B(x) binnary : 0b11111110
 We finaly calculate S(x) :
 ```
 S(x) = (A*x) XOR b
-x = 00011001
-A = fixed 8×8 matrix GENERATED HOW ?
-b = constant 01100011 WHERE DOES THIS CONSTANT COME FROM ?
+x = 11111110   # this is B(x), the inverse computed just above (254)
+A = fixed 8×8 matrix
+b = constant 01100011
 
-DETAIL OF THE CALCULATION FROM HELL
-
-S(01000001) = 10111010
+S(01000001) = 10000011
 ```
+
+`A` and `b` aren't chosen randomly. `A` is the fixed circulant matrix obtained by rotating the bit pattern `10001111`, which means each output bit is `bᵢ ⊕ b₍ᵢ₊₄₎ ⊕ b₍ᵢ₊₅₎ ⊕ b₍ᵢ₊₆₎ ⊕ b₍ᵢ₊₇₎` (indices mod 8). The constant `b = 01100011 = 0x63` is fixed by the standard. This pair was selected so that the S-box stays reversible (`A` is invertible) and has no fixed point (`S(a) ≠ a`) nor opposite fixed point (`S(a) ≠ ā`), which removes the algebraic regularities an attacker could exploit. The calculation itself is just that : for each bit of `B(x)`, XOR it with four other bits at fixed offsets, then XOR the constant `0x63`.
 
 In practice, this isn't calculated manually. We use either a pre-calculated S-box table or an exponentiation algorithm in GF.
 
@@ -561,7 +562,7 @@ WARNING: Since we are working with polynomials here, the × symbol does not repr
 value :    00000010 × 10110110
 position : 76543210   76543210
 
-00000010 = x WHY ?
+00000010 = x   # only bit 1 is set, so the polynomial is x¹ = x
 10110110 = x^7 + x^5 + x^4 + x^2 + x
 x × (x^7 + x^5 + x^4 + x^2 + x)
 
@@ -690,7 +691,7 @@ Hx = (Cx * H^x)
 
 Where x is the number of cipher block.
 ```
-And this is what it is parallelizable. This is why GCM is called a "PMAC" (Parallelizable message authentication code).
+And this is what makes it parallelizable. This authentication part of GCM is called GMAC (Galois Message Authentication Code).
 
 ### Hash functions
 #### SHA-1
@@ -873,7 +874,7 @@ x >> 2 = right shift of 2
 01011 >> 2 = 00010
 
 x >>> 2 = right rotation of 2
-01001 >>> 2 = 11010
+01001 >>> 2 = 01010
 ```
 
 #### SHA-3
@@ -1179,7 +1180,7 @@ The fact that internet requests tend to dilute this delay doesn't prevent an att
 To avoid this, fixed-time comparison functions must be used.
 
 ###### Power analysis
-A computer consumes more electricity when it processes 0s (0 volts) than 1s (5 volts), that's why by analyzing the electrical consumption we can guess the secret.
+A computer consumes more electricity when it processes 1s (5 volts) than 0s (0 volts), that's why by analyzing the electrical consumption we can guess the secret.
 
 When the processor performs a calculation: SHA-256(message) The transistors change state this creates electricity variations. These variations can reveal: internal bits, state of the calculation, secret key (in HMAC).
 
@@ -1204,7 +1205,9 @@ The goal here is not to read the data used by the victim, but to know which memo
 
 - If the key bit is 0, the algorithm will get the information in index B.
 
-Flush + Reload : The attacker clears a specific cache entry. They wait for the victim to execute the command, then reload the data. If they reload it quickly, it means the victim has used it. Very precise, but requires sharing files (libraries) with the victim. WHY DIDN'T I UNDERSTAND THIS PART
+Flush + Reload : The attacker clears a specific cache entry. They wait for the victim to execute the command, then reload the data. If they reload it quickly, it means the victim has used it. Very precise, but requires sharing files (libraries) with the victim.
+
+Flush + Reload only works because the attacker and the victim share the same physical memory (a common library mapped into both processes). The attacker flushes one specific cache line (one entry of a lookup table inside that shared library), so it now lives only in RAM. The victim then runs; if its code touches that exact address (a secret-dependent lookup), the CPU caches it again. The attacker finally reads the same address and times it : fast means it was already cached, so the victim used it; slow means it came from RAM, so it didn't. Because both processes see the *same* cache line, the attacker learns which secret-dependent address the victim accessed, and that shared memory is exactly why the attack needs a shared file.
 
 Prime + Probe : The attacker fills the cache with their own data. They let the victim execute. If the attacker's access to their own data is subsequently slow, it means the victim has "expelled" their data to use that cache space. Precise, requires sharing the same processor, but you monitor your own data.
 
@@ -1222,9 +1225,11 @@ ClientHello
 ```
 TLS version supported by the client
 Supported cryptographic suites
-Random : a number used to generate sessions key (WHAT DOES THAT MEAN ?)
+Random : a number used to generate sessions key
 Extensions : domain requested, protocol requested (HTTP1/2, etc...)
 ```
+
+The `Random` is a 32-byte field that each side fills with random data. Both the client and the server send their own, and both are mixed into the key derivation together with the shared secret, so every handshake produces unique session keys, even if the same secret were ever reused. It guarantees freshness and protects against replay.
 
 ServerHello
 ```
@@ -1280,7 +1285,7 @@ TLS don't do : ECDHE secret = AES key
 
 It use the ECDHE secret to generate multi-keys with a specific use. This process use HKDF (key derivation function based on HMAC).
 
-MORE DETAIL NEEDED
+HKDF works in two steps. **Extract** turns the ECDHE secret into one uniform pseudo-random key (PRK), then **Expand** derives several independent sub-keys from that PRK, each bound to a distinct label. TLS 1.3 chains this through successive stages (Early Secret, derived from a PSK, then Handshake Secret, which mixes in the ECDHE secret, then Master Secret), and from each stage it derives purpose-specific keys : client and server handshake traffic keys, application traffic keys, exporter and resumption secrets. Each key serves a single purpose and the labels keep them cryptographically separated, so compromising one never exposes the others.
 
 #### Why TLS 1.3 is faster
 
@@ -1625,7 +1630,7 @@ def padding_oracle(cipher_text):
 for i in range(256):
 
     # modify the last byte of the first block of encrypted text
-    # why 02x ?
+    # {i:02x} formats i as two-digit zero-padded hex (10 gives '0a', 255 gives 'ff'), keeping each byte two digits so the hexdump stays aligned
     candidate = f"20 5b b4 b7 86 e5 4e 9b 0c 4d 40 8b 44 ba 14 {i:02x} | c6 d6 66 33 29 19 6d 76 ab 90 e6 8a bf fa 79 7a"
     cipher_candidate = hexreversedump(candidate)
     
