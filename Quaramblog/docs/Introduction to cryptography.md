@@ -50,7 +50,7 @@ Example with 4⁸ mod 10
 (x * 3) mod 101 = 1
 ```
 
-To find x we can use the Fermat Theorem. The exponent is always (modulus - 2), so here 101-2 = 99 :
+To find x we can use the Fermat Theorem. The exponent is always -2, so here 101-2 = 99 :
 ```
 3 ** (101-2)
 3 ** 99 = 171792506910670443678820376588540424234035840667
