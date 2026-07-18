@@ -1,3 +1,26 @@
 .md-grid {
   max-width: 80%;
 }
+
+[data-md-color-scheme="default"] {
+  --md-default-bg-color: #f7f1e6;
+  --md-primary-fg-color: #7fa86b;
+  --md-accent-fg-color: #d98b5f;
+  --md-default-fg-color: #4a453d;
+  --md-code-bg-color: #eee6d8;
+}
+
+.md-logo img {
+  height: 2.8rem !important;
+  width: auto;
+  transition: transform 0.2s ease;
+}
+
+.md-header__button.md-logo {
+  padding: 0.2rem;
+  margin-top: 0.1rem;
+}
+
+.md-header__title {
+  margin-left: 0.8rem;
+}

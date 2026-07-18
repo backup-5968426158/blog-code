@@ -1,4 +1,9 @@
-# Welcome to the Quaramblog
+# Welcome to nohor.net
+
+### Where am I ?
+This cybersecurity blog is a student project aimed at learning and sharing knowledge about the field. Most articles are written in English, with the exception of the one on indistinguishable obfuscation.
+
+If you come across any inaccuracies or errors, I would appreciate your feedback.
 
 ### About the use of AI in the creation of this blog:
 

@@ -1,14 +1,14 @@
-site_name: Quaramblog
+site_name: Nohor.net
 
 theme:
   name: material
-  logo: assets/yotsuba.png
-  favicon: assets/yotsuba.png
+  logo: assets/revy_2.jpg
+  favicon: assets/revy_2.jpg
 
   palette:
-    scheme: slate
-    primary: black
-    accent: black
+    scheme: default
+    primary: light green
+    accent: orange
 
 extra:
   generator: false
