@@ -2,8 +2,8 @@ site_name: Nohor.net
 
 theme:
   name: material
-  logo: assets/revy_2.jpg
-  favicon: assets/revy_2.jpg
+  logo: assets/art.jpg
+  favicon: assets/a.jpg
 
   palette:
     scheme: default
