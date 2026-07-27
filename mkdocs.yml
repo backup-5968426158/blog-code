@@ -22,3 +22,15 @@ markdown_extensions:
       anchor_linenums: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
+
+nav:
+  - Home: index.md
+  - New articles :
+      - Memory vulnerabilities: "Memory vulnerabilities.md"
+      - Introduction to cryptography: "Introduction to cryptography.md"
+
+  - Articles :
+      - What is eBPF: "What is eBPF.md"
+      - Indistinguishability obfuscation: "Indistinguishability obfuscation.md"
+      - Creation and analysis of a keylogger developed in x86 assembly: "Creation and analysis of a keylogger developed in x86 assembly.md"
+      - Labs Arkime : "Labs _ OpenSearch + Arkime + OpenSearch Dashboards.md"
