@@ -2,8 +2,8 @@ site_name: Nohor.net
 
 theme:
   name: material
-  logo: assets/art.jpg
-  favicon: assets/a.jpg
+  logo: assets/yotsuba.png
+  favicon: assets/yotsuba.png
 
   palette:
     scheme: default
