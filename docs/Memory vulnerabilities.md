@@ -3402,7 +3402,7 @@ Dans notre cas, `%17$p` permet par exemple de récupérer :
 %17$p = 0x000061dae7800a2a
 ```
 
-Cette adresse correspond à une adresse située dans le binaire, pour en récupérer l'offset on peut utiliser vmmap :
+This address is corresponding to a location within the binary; to retrieve the offset, we can use vmmap:
 ```bash
 pwndbg> b *main+147
 
