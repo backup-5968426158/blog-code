@@ -3199,7 +3199,9 @@ int main(){
   ----------------------------------------------------------------------------
 ```
 
+
 # Various demonstrations for practical applications
+
 ## Try hack me PWN107 : Format string to leak canary, PIE, and buffer overflow to ret2win/ret2libc
 
 ```
@@ -3396,8 +3398,7 @@ The values ​​vary depending on the libc version !
 
 ### Calculate the PIE base and find the get_streak function
 
-Dans notre cas, `%17$p` permet par exemple de récupérer :
-
+In our case, `%17$p` allows us, to retrieve, for example :
 ```
 %17$p = 0x000061dae7800a2a
 ```
