@@ -3503,8 +3503,6 @@ saved RIP    :  8 bytes
 
 ### Final exploit with ret2win
 
-Le script complet devient donc :
-
 ```py
 from pwn import *
 
